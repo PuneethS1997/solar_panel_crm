@@ -164,3 +164,58 @@
     border-radius: 20px;
     margin-top: 40px;
 }
+.eco-section {
+    position: relative;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    padding: 100px 20px;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: 1.2s ease;
+}
+
+.eco-section.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.eco-title {
+    font-size: 42px;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+}
+
+.eco-stats {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    flex-wrap: wrap;
+}
+
+.eco-box h3 {
+    font-size: 60px;
+    color: #00ffb3;
+}
+
+.eco-message {
+    margin-top: 40px;
+    font-size: 22px;
+    opacity: 0;
+    transition: 1.5s ease;
+}
+
+.eco-section.active .eco-message {
+    opacity: 1;
+}
+@keyframes floatTree {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-800px);
+        opacity: 0;
+    }
+}

@@ -121,6 +121,8 @@ function calculateSubsidy(systemSize, costPerKW, subsidyPercent, maxKW) {
 
     return eligibleAmount * (subsidyPercent / 100);
 }
+
+
 function calculateProjection(systemSize, tariff, exportRate, consumption) {
 
     let yearlyData = [];
@@ -155,4 +157,67 @@ new Chart(ctx, {
             tension: 0.3
         }]
     }
+});
+
+function calculateEnvironmentalImpact(systemKW, settings, annualProduction) {
+
+    // Total CO2 saved per year
+    const co2SavedPerYear = systemKW * settings.co2_per_kw;
+
+    // 25-year total (with no degradation for impact story)
+    const totalCO2 = co2SavedPerYear * 25;
+
+    // Trees equivalent
+    const treesPlanted = totalCO2 / settings.co2_per_tree;
+
+    return {
+        totalCO2: totalCO2.toFixed(0),
+        treesPlanted: treesPlanted.toFixed(0)
+    };
+}
+function createFloatingTrees() {
+    const section = document.getElementById("ecoImpact");
+
+    for (let i = 0; i < 15; i++) {
+        let tree = document.createElement("div");
+        tree.innerHTML = "🌳";
+        tree.style.position = "absolute";
+        tree.style.fontSize = Math.random() * 30 + 20 + "px";
+        tree.style.left = Math.random() * 100 + "%";
+        tree.style.bottom = "-50px";
+        tree.style.animation = `floatTree ${5 + Math.random()*5}s linear infinite`;
+        section.appendChild(tree);
+    }
+}
+function animateValue(id, start, end, duration) {
+    let range = end - start;
+    let current = start;
+    let increment = end > start ? 1 : -1;
+    let stepTime = Math.abs(Math.floor(duration / range));
+    let obj = document.getElementById(id);
+
+    let timer = setInterval(function () {
+        current += increment;
+        obj.innerText = current.toLocaleString();
+        if (current == end) {
+            clearInterval(timer);
+        }
+    }, stepTime);
+}
+const impact = calculateEnvironmentalImpact(
+    systemKW,
+    settings,
+    annualProduction
+);
+
+document.getElementById("ecoImpact").classList.add("active");
+
+animateValue("treeCount", 0, impact.treesPlanted, 2000);
+animateValue("co2Count", 0, impact.totalCO2, 2500);
+
+createFloatingTrees();
+
+window.scrollTo({
+    top: document.getElementById("ecoImpact").offsetTop,
+    behavior: "smooth"
 });

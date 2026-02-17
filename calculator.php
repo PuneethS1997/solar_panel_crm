@@ -23,11 +23,13 @@ if(!$settings){
             <div class="row g-3">
 
                 <div class="col-md-4">
-                <select id="state">
+                <label>Select State</label>
+
+                <select id="state"  class="form-control">
                     <?php
                     $stmt = $pdo->query("SELECT * FROM states");
                     while($row = $stmt->fetch()){
-                        echo "<option value='{$row['id']}'>{$row['state_name']}</option>";
+                        echo "<option value='{$row['id']}' >{$row['state_name']}</option>";
                     }
                     ?>
                 </select>
@@ -86,11 +88,30 @@ if(!$settings){
         <canvas id="roiChart" height="100"></canvas>
 
         <!-- ENVIRONMENTAL IMPACT -->
-        <div class="impact-section text-center mt-5">
-            <h2 class="fw-bold mb-3">Your Environmental Contribution 🌍</h2>
-            <h3 id="trees"></h3>
-            <h3 id="co2"></h3>
+        <section id="ecoImpact" class="eco-section">
+    <div class="eco-overlay"></div>
+
+    <div class="eco-content">
+        <h2 class="eco-title">🌍 Environmental Impact</h2>
+
+        <div class="eco-stats">
+            <div class="eco-box">
+                <h3 id="treeCount">0</h3>
+                <p>Trees Planted</p>
+            </div>
+
+            <div class="eco-box">
+                <h3 id="co2Count">0</h3>
+                <p>kg CO₂ Prevented</p>
+            </div>
         </div>
+
+        <div class="eco-message">
+            You are officially a Climate Hero 🚀
+        </div>
+    </div>
+</section>
+
 
     </div>
 </section>

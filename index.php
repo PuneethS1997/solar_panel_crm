@@ -22,9 +22,12 @@
             </div>
 
             <div class="col-lg-6 text-center mt-5 mt-lg-0">
-                <img src="assets/images/solar-hero.png" 
+                <!-- <img src="assets/videos/hero.mp.4" 
                      class="img-fluid hero-img" 
-                     alt="Solar Panel">
+                     alt="Solar Panel"> -->
+
+                     <video src="assets/videos/hero.mp4" class="img-fluid hero-img" 
+                     alt="Solar Panel"></video>
             </div>
 
         </div>
