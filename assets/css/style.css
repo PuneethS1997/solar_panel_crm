@@ -1,0 +1,166 @@
+.navbar {
+    background: rgba(0,0,0,0.85) !important;
+    backdrop-filter: blur(8px);
+}
+
+.nav-link {
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    color: #FDB813 !important;
+}
+
+.btn-warning {
+    background-color: #FDB813;
+    border: none;
+}
+
+
+.hero-section {
+    height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                url('../images/solar-bg.jpg') center/cover no-repeat;
+    position: relative;
+}
+
+.hero-title {
+    font-size: 48px;
+    font-weight: 700;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.hero-subtitle {
+    font-size: 18px;
+    opacity: 0.9;
+    animation: fadeInUp 1.3s ease-in-out;
+}
+
+.hero-img {
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+
+.feature-card {
+    background: #111827;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 20px #00E5FF;
+}
+
+.cta-section {
+    background: linear-gradient(135deg, #f9a825, #f57f17);
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 32px;
+    }
+
+    .hero-section {
+        height: auto;
+        padding: 100px 0;
+    }
+}
+
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 25px;
+    right: 25px;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 28px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1);
+    color: #fff;
+}
+
+.solar-calculator {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+}
+
+.solar-calculator .card {
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f9a825, #f57f17);
+    border: none;
+    color: #fff;
+}
+
+.btn-warning:hover {
+    opacity: 0.9;
+}
+.stats-section {
+    background: linear-gradient(135deg, #111827, #1f2937);
+}
+
+.stat-box h2 {
+    font-size: 42px;
+    font-weight: 700;
+    color: #f9a825;
+}
+
+.stat-box p {
+    margin-top: 10px;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.testimonial-card {
+    max-width: 700px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+}
+
+.testimonial-text {
+    font-size: 18px;
+    font-style: italic;
+    color: #555;
+}
+
+.testimonials-section h2 {
+    font-size: 36px;
+}
+.calculator-page {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+}
+
+.impact-section {
+    background: linear-gradient(135deg, #111827, #1f2937);
+    color: #fff;
+    padding: 50px;
+    border-radius: 20px;
+    margin-top: 40px;
+}
