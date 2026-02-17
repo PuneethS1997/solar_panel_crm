@@ -90,26 +90,72 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("ecoImpact")?.classList.add("active");
 
 
-        console.table({
-            monthly_bill,
-            unit_price: solarSettings.unit_price,
-            sunlight_factor: solarSettings.sunlight_factor,
-            co2_per_kw: solarSettings.co2_per_kw,
-            co2_per_tree: solarSettings.co2_per_tree
-        });
-        console.log("solarSettings:", solarSettings);
+    
 
+        window.calculatedData = {
+            monthly_bill: monthly_bill,
+            estimated_kw: systemKW,
+            estimated_cost: final_cost,
+            yearly_savings: yearly_savings
+        };
         
 
     });
-    console.table({
-        monthly_bill,
-        unit_price: solarSettings.unit_price,
-        sunlight_factor: solarSettings.sunlight_factor,
-        co2_per_kw: solarSettings.co2_per_kw,
-        co2_per_tree: solarSettings.co2_per_tree
+
+    document.getElementById("submitLead")?.addEventListener("click", function() {
+
+        const name = document.getElementById("leadName").value.trim();
+        const phone = document.getElementById("leadPhone").value.trim();
+        const email = document.getElementById("leadEmail").value.trim();
+        const city = document.getElementById("leadCity").value.trim();
+    
+        if (!name || !phone) {
+            alert("Please enter name and phone");
+            return;
+        }
+    
+        fetch("saveLead.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name,
+                phone,
+                email,
+                city,
+                monthly_bill: window.calculatedData.monthly_bill,
+                estimated_kw: window.calculatedData.estimated_kw,
+                estimated_cost: window.calculatedData.estimated_cost,
+                yearly_savings: window.calculatedData.yearly_savings,
+                message: "Lead from Solar Calculator"
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            console.log(data);
+
+
+            const message = `🔥 New Solar Calculator Lead
+        
+        Name: ${name}
+        Phone: ${phone}
+        City: ${city}
+        Monthly Bill: ₹${window.calculatedData.monthly_bill}
+        System Size: ${window.calculatedData.estimated_kw} kW
+        Yearly Savings: ₹${window.calculatedData.yearly_savings}
+        
+        Status: New Lead`;
+        
+            const adminNumber = "919738805931"; // replace with your number (with country code)
+        
+            window.open(`https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`, "_blank");
+        
+            alert("Thank you! Our solar expert will contact you soon.");
+        });
+        
     });
-    console.log("solarSettings:", solarSettings);
+    
+
 
 });
 

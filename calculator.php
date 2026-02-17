@@ -115,9 +115,22 @@ if(!$settings){
     </div>
 </section>
 
+<div class="lead-box mt-4">
+    <h4>Get Detailed Solar Proposal</h4>
+
+    <input type="text" id="leadName" placeholder="Full Name" class="form-control mb-2">
+    <input type="text" id="leadCity" placeholder="City" class="form-control mb-2">
+    <input type="tel" id="leadPhone" placeholder="Mobile Number" class="form-control mb-2">
+    <input type="email" id="leadEmail" placeholder="Email (Optional)" class="form-control mb-2">
+
+    <button id="submitLead" class="btn btn-success w-100">
+        Get Free Consultation 🚀
+    </button>
+</div>
 
     </div>
 </section>
+
 
 <script>
 const solarSettings = {
