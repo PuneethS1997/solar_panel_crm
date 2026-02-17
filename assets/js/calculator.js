@@ -1,136 +1,139 @@
+console.log("JS Loaded");
+
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    document.getElementById("calculateBtn").addEventListener("click", function () {
+    const calculateBtn = document.getElementById("calculateBtn");
+    if (!calculateBtn) return;
 
-        // your calculation logic here
-        let monthly_bill = parseFloat(document.getElementById("bill").value);
+    calculateBtn.addEventListener("click", async function () {
+
+        console.log("Button Clicked");
+
+
+        const monthlyBillInput = document.getElementById("bill");
+        if (!monthlyBillInput) return;
+
+        const monthly_bill = parseFloat(monthlyBillInput.value);
 
         if (!monthly_bill || monthly_bill <= 0) {
             alert("Enter valid bill amount");
             return;
         }
-    
-        // 🔥 Dynamic Values From DB
-        let unit_price = solarSettings.unit_price;
-        let sunlight_factor = solarSettings.sunlight_factor;
-        let cost_per_kw = solarSettings.cost_per_kw;
-        let subsidy_percent = solarSettings.subsidy_percent;
-        let co2_per_kw = solarSettings.co2_per_kw;
-        let co2_per_tree = solarSettings.co2_per_tree;
-    
-        // 🔥 Calculations
-        let units = monthly_bill / unit_price;
-        let kw = units / sunlight_factor;
-    
-        let installation_cost = kw * cost_per_kw;
-        let subsidy = installation_cost * subsidy_percent / 100;
-        let final_cost = installation_cost - subsidy;
-    
-        let yearly_savings = monthly_bill * 12;
-        let payback_years = (final_cost / yearly_savings).toFixed(1);
-        let total_25_year_savings = (yearly_savings * 25 - final_cost).toFixed(0);
-    
+
+        // 🔥 Ensure solarSettings exists
+        if (typeof solarSettings === "undefined") {
+            console.error("solarSettings not loaded");
+            return;
+        }
+
+        // 🔥 Settings from DB
+        const {
+            unit_price,
+            sunlight_factor,
+            cost_per_kw,
+            subsidy_percent,
+            co2_per_kw,
+            co2_per_tree,
+            export_rate
+        } = solarSettings;
+
+        // 🔥 Core Calculations
+        const units = monthly_bill / unit_price;
+        const systemKW = units / sunlight_factor;
+
+        const installation_cost = systemKW * cost_per_kw;
+        const subsidy = installation_cost * subsidy_percent / 100;
+        const final_cost = installation_cost - subsidy;
+
+        const yearly_savings = monthly_bill * 12;
+        const payback_years = (final_cost / yearly_savings).toFixed(1);
+        const total_25_year_savings = (yearly_savings * 25 - final_cost).toFixed(0);
+
         // 🌍 Environmental
-        let total_co2_saved = (kw * co2_per_kw * 25).toFixed(0);
-        let trees_equivalent = Math.floor(total_co2_saved / co2_per_tree);
-    
-        // Show section
-        document.getElementById("resultSection").classList.remove("d-none");
-    
-        document.getElementById("payback").innerHTML = payback_years + " Years";
-        document.getElementById("totalSavings").innerHTML = "₹" + total_25_year_savings;
-        document.getElementById("systemSize").innerHTML = kw.toFixed(2) + " kW";
-    
-        // Animate Environmental
-        animateValue("trees", 0, trees_equivalent, 2000, " Trees 🌳");
-        animateValue("co2", 0, total_co2_saved, 2000, " kg CO₂ Reduced");
-    
-        // ROI Chart
-        generateChart(yearly_savings, final_cost);
+        const total_co2_saved = (systemKW * co2_per_kw * 25).toFixed(0);
+        const trees_equivalent = Math.floor(total_co2_saved / co2_per_tree);
+
+        // 📊 Projection Data
+        const projectionData = calculateProjection(
+            systemKW,
+            unit_price,
+            export_rate || 3,
+            units
+        );
+
+        // Show Results
+        document.getElementById("resultSection")?.classList.remove("d-none");
+
+        setText("payback", payback_years + " Years");
+        setText("totalSavings", "₹" + Number(total_25_year_savings).toLocaleString());
+        setText("systemSize", systemKW.toFixed(2) + " kW");
+
+        animateValue("trees", 0, trees_equivalent, 2000);
+        animateValue("co2", 0, total_co2_saved, 2000);
+
+        generateROIChart(yearly_savings, final_cost);
+        generateProjectionChart(projectionData);
+
+        // AFTER systemKW calculation
+
+            const totalCO2 = systemKW * solarSettings.co2_per_kw * 25;
+            const trees = totalCO2 / solarSettings.co2_per_tree;
+
+            console.log("SystemKW:", systemKW);
+            console.log("TotalCO2:", totalCO2);
+            console.log("Trees:", trees);
+
+            animateValue("treeCount", 0, Math.floor(trees), 2000);
+            animateValue("co2Count", 0, Math.floor(totalCO2), 2500);
+
+            document.getElementById("ecoImpact")?.classList.add("active");
+
+
+        console.table({
+            monthly_bill,
+            unit_price: solarSettings.unit_price,
+            sunlight_factor: solarSettings.sunlight_factor,
+            co2_per_kw: solarSettings.co2_per_kw,
+            co2_per_tree: solarSettings.co2_per_tree
+        });
+        console.log("solarSettings:", solarSettings);
+
+        
 
     });
+    console.table({
+        monthly_bill,
+        unit_price: solarSettings.unit_price,
+        sunlight_factor: solarSettings.sunlight_factor,
+        co2_per_kw: solarSettings.co2_per_kw,
+        co2_per_tree: solarSettings.co2_per_tree
+    });
+    console.log("solarSettings:", solarSettings);
 
 });
 
-function animateValue(id, start, end, duration) {
-    const obj = document.getElementById(id);
-    if (!obj) return;
 
-    let startTimestamp = null;
 
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
-
-        if (progress < 1) {
-            window.requestAnimationFrame(step);
-        }
-    };
-
-    window.requestAnimationFrame(step);
+/* ------------------------------
+   Utility Safe Text Setter
+--------------------------------*/
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = value;
 }
 
 
-
-function generateChart(yearly_savings, final_cost) {
-
-    const ctx = document.getElementById('roiChart').getContext('2d');
-
-    if(window.myChart) {
-        window.myChart.destroy();
-    }
-
-    window.myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: Array.from({length: 25}, (_, i) => "Year " + (i+1)),
-            datasets: [{
-                label: 'Net Savings Growth',
-                data: Array.from({length: 25}, (_, i) => (yearly_savings * (i+1) - final_cost)),
-                borderColor: '#f9a825',
-                backgroundColor: 'rgba(249,168,37,0.2)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            animation: { duration: 2000 }
-        }
-    });
-}
-
-
-async function fetchStateData() {
-
-    const state = document.getElementById("state").value;
-    const type = document.getElementById("connectionType").value;
-
-    const response = await fetch(`getStateData.php?state_id=${state}&connection_type=${type}`);
-    const data = await response.json();
-
-    return data;
-}
-function calculateSubsidy(systemSize, costPerKW, subsidyPercent, maxKW) {
-
-    const eligibleKW = Math.min(systemSize, maxKW);
-
-    const eligibleAmount = eligibleKW * costPerKW;
-
-    return eligibleAmount * (subsidyPercent / 100);
-}
-
-
+/* ------------------------------
+   Projection Logic
+--------------------------------*/
 function calculateProjection(systemSize, tariff, exportRate, consumption) {
 
     let yearlyData = [];
-    let degradation = 0.005; // 0.5%
-
+    let degradation = 0.005;
     let productionPerYear = systemSize * 4 * 365;
 
-    for(let year = 1; year <= 25; year++) {
+    for (let year = 1; year <= 25; year++) {
 
         let degradedProduction = productionPerYear * Math.pow((1 - degradation), year - 1);
 
@@ -144,80 +147,104 @@ function calculateProjection(systemSize, tariff, exportRate, consumption) {
 
     return yearlyData;
 }
-const yearlySavings = calculateProjection(...);
 
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: Array.from({length: 25}, (_, i) => `Year ${i+1}`),
-        datasets: [{
-            label: 'Annual Savings',
-            data: yearlySavings,
-            borderColor: 'green',
-            tension: 0.3
-        }]
+
+/* ------------------------------
+   ROI Chart
+--------------------------------*/
+function generateROIChart(yearly_savings, final_cost) {
+
+    const canvas = document.getElementById("roiChart");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    if (window.roiChartInstance) {
+        window.roiChartInstance.destroy();
     }
-});
 
-function calculateEnvironmentalImpact(systemKW, settings, annualProduction) {
-
-    // Total CO2 saved per year
-    const co2SavedPerYear = systemKW * settings.co2_per_kw;
-
-    // 25-year total (with no degradation for impact story)
-    const totalCO2 = co2SavedPerYear * 25;
-
-    // Trees equivalent
-    const treesPlanted = totalCO2 / settings.co2_per_tree;
-
-    return {
-        totalCO2: totalCO2.toFixed(0),
-        treesPlanted: treesPlanted.toFixed(0)
-    };
+    window.roiChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: 25 }, (_, i) => "Year " + (i + 1)),
+            datasets: [{
+                label: 'Net Savings Growth',
+                data: Array.from({ length: 25 }, (_, i) =>
+                    (yearly_savings * (i + 1) - final_cost)
+                ),
+                borderColor: '#f9a825',
+                backgroundColor: 'rgba(249,168,37,0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: { responsive: true }
+    });
 }
-function createFloatingTrees() {
-    const section = document.getElementById("ecoImpact");
 
-    for (let i = 0; i < 15; i++) {
-        let tree = document.createElement("div");
-        tree.innerHTML = "🌳";
-        tree.style.position = "absolute";
-        tree.style.fontSize = Math.random() * 30 + 20 + "px";
-        tree.style.left = Math.random() * 100 + "%";
-        tree.style.bottom = "-50px";
-        tree.style.animation = `floatTree ${5 + Math.random()*5}s linear infinite`;
-        section.appendChild(tree);
+
+/* ------------------------------
+   Projection Chart
+--------------------------------*/
+function generateProjectionChart(yearlySavings) {
+
+    const canvas = document.getElementById("projectionChart");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    if (window.projectionChartInstance) {
+        window.projectionChartInstance.destroy();
     }
-}
-function animateValue(id, start, end, duration) {
-    let range = end - start;
-    let current = start;
-    let increment = end > start ? 1 : -1;
-    let stepTime = Math.abs(Math.floor(duration / range));
-    let obj = document.getElementById(id);
 
-    let timer = setInterval(function () {
-        current += increment;
-        obj.innerText = current.toLocaleString();
-        if (current == end) {
-            clearInterval(timer);
+    window.projectionChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: 25 }, (_, i) => `Year ${i + 1}`),
+            datasets: [{
+                label: 'Annual Savings',
+                data: yearlySavings,
+                borderColor: 'green',
+                tension: 0.3
+            }]
         }
-    }, stepTime);
+    });
 }
-const impact = calculateEnvironmentalImpact(
-    systemKW,
-    settings,
-    annualProduction
-);
 
-document.getElementById("ecoImpact").classList.add("active");
 
-animateValue("treeCount", 0, impact.treesPlanted, 2000);
-animateValue("co2Count", 0, impact.totalCO2, 2500);
+/* ------------------------------
+   Animate Counter
+--------------------------------*/
+function animateValue(id, start, end, duration) {
 
-createFloatingTrees();
+    const obj = document.getElementById(id);
+    if (!obj) return;
 
-window.scrollTo({
-    top: document.getElementById("ecoImpact").offsetTop,
-    behavior: "smooth"
-});
+    if (end <= 0) {
+        obj.innerText = 0;
+        return;
+    }
+
+    let startTimestamp = null;
+
+    const step = (timestamp) => {
+
+        if (!startTimestamp) startTimestamp = timestamp;
+
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+        obj.innerText =
+            Math.floor(progress * (end - start) + start).toLocaleString();
+
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+
+    window.requestAnimationFrame(step);
+}
+const totalCO2 = systemKW * solarSettings.co2_per_kw * 25;
+const trees = totalCO2 / solarSettings.co2_per_tree;
+
+animateValue("treeCount", 0, Math.floor(trees), 2000);
+animateValue("co2Count", 0, Math.floor(totalCO2), 2500);

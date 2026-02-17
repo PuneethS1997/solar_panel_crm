@@ -87,6 +87,9 @@ if(!$settings){
         <!-- CHART -->
         <canvas id="roiChart" height="100"></canvas>
 
+        <canvas id="projectionChart"></canvas>
+
+
         <!-- ENVIRONMENTAL IMPACT -->
         <section id="ecoImpact" class="eco-section">
     <div class="eco-overlay"></div>
@@ -127,5 +130,7 @@ const solarSettings = {
 };
 </script>
 
-
+<script>
+const settings = <?= json_encode($settings); ?>;
+</script>
 <?php include 'includes/footer.php'; ?>
